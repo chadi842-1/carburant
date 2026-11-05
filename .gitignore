@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+
+# Regenerable by `carburant run`
+/lake/
+/warehouse/
+dbt/target/
+dbt/logs/
+dbt/.user.yml
+logs/
