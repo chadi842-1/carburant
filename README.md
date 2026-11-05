@@ -13,8 +13,9 @@ and retrieval over the project documentation.
 > - **Local stack.** DuckDB stands in for BigQuery and a date-partitioned folder for Cloud Storage.
 >   The dbt project has a `bigquery` target and BigQuery partitioning/clustering configs, but
 >   **nothing was run on GCP** (no credentials here).
-> - **No LLM is called.** The agent's router is rule-based, so answers are reproducible; an
->   `llm_fn` hook can reword answers without changing their numbers.
+> - **No large language model is called.** The agent routes questions with a learned intent
+>   classifier (TF-IDF + logistic regression); answers are reproducible, and an `llm_fn` hook can
+>   reword them without changing their numbers.
 
 [src]: https://www.data.gouv.fr/datasets/fuel-prices-in-france-2
 
@@ -47,7 +48,7 @@ Python 3.12+.
 ```bash
 pip install -e ".[dev]"
 carburant run --stations 2000 --days 180     # whole pipeline + reports/results.md (~50 s)
-pytest -q                                    # 77 tests (builds a warehouse, runs dbt build)
+pytest -q                                    # 103 tests (builds a warehouse, runs dbt build)
 carburant ask "Quelle station est la moins chère pour le gazole à Lyon cette semaine ?"
 uvicorn carburant.api:app --port 8000        # POST /ask, GET /cheapest, /anomalies, /quality
 ```
@@ -78,21 +79,22 @@ data with no injected anomaly the rule flags 0.11 % of prices (false alarms by c
 
 ![Anomaly evaluation](reports/anomaly_eval.png)
 
-**Agent.** 45 held-out questions (28 data, 12 documentation, 5 out of scope), written before the
-agent saw them; expected answers come from an independent pandas oracle.
+**Agent.** Two routers share the same read-only SQL tool and BM25 retrieval: **v1 rules** (frozen)
+and **v2**, a learned intent classifier (TF-IDF on words and characters, logistic regression,
+trained on ~950 generated paraphrases, declining below 0.5 confidence). The first question set was
+used while building v2 (development); a second set of 45 questions was **committed before v2
+existed and run once** (test). Expected answers come from an independent pandas oracle.
 
-| | Correct |
-|---|---|
-| Data questions | 21 / 28 |
-| Documentation questions | 11 / 12 |
-| Out-of-scope (must decline) | 4 / 5 |
-| **Total** | **36 / 45 (80 %)** |
+| Router | Development set | **Held-out test set** | Off-topic answered (test) |
+|---|---|---|---|
+| v1 rules | 36 / 45 (80 %) | 33 / 45 (73 %) | 3 of 7 |
+| **v2 classifier** | 44 / 45 (98 %, not held out) | **40 / 45 (89 %)** | 3 of 7 |
 
-Every answered question cites its source (SQL query or documentation section). Median latency
-34 ms (warm, in-process, no network, no LLM). The router was frozen after the first evaluation
-so the score stays honest; failures are paraphrases outside its rules ("pas cher", "Top 3 des",
-"a-t-il augmenté", "anormaux"), the name "SP95-E10", a motorway-only average it cannot express,
-one retrieval miss, and one hallucination: a train-ticket price question answered with a fuel price.
+On the test set, data questions go from 19/28 to 27/28. Refusing off-topic questions did not
+improve: questions that reuse fuel wording ("prix moyen d'un appartement", "stations de métro",
+"prix du baril de Brent") are still answered as fuel questions. Every answered question cites its
+source; median latency about 35 ms (in-process, no network). The same person wrote the training
+templates and both question sets, so these scores are optimistic compared with real users.
 
 **Orchestration and CI.** The Airflow DAG was parsed by Airflow 3.1.8 and run end to end with
 `airflow dags test` (five tasks, success, about 30 s). CI runs ruff and pytest on Python 3.12 and
@@ -118,18 +120,19 @@ one retrieval miss, and one hallucination: a train-ticket price question answere
 - Not deployed to GCP: BigQuery, Cloud Storage and Cloud Run are configured or documented, not run.
   No Looker Studio report was built; `mart_dashboard` is the table one would connect.
 - The Docker image was not built (no daemon here); its steps were run in a clean virtualenv.
-- The agent is rule-based: it handles the phrasings it was designed for and fails on others
-  (20 % of the held-out set). An LLM router would be the natural next step.
+- The agent's classifier is trained on generated paraphrases, not real user questions; it fails
+  on 11 % of the held-out set and still answers some off-topic questions. An LLM router, or real
+  user logs to train on, would be the next step.
 - No regulatory texts in the retrieval corpus; only project documentation.
 
 ## Layout
 
 ```
-src/carburant/   config, geo, ingest, synthetic, warehouse, anomaly, rag, tools, agent,
+src/carburant/   config, geo, ingest, synthetic, warehouse, anomaly, rag, tools, agent, intent,
                  evaluate, dashboard, report, cli, api; docs/ (retrieval corpus, French)
 dbt/             models (staging, marts), macros (generic tests), seeds, profiles (duckdb, bigquery)
 airflow/         dags/carburant_daily.py, check_dag.py
-eval/            questions.json (held-out agent evaluation set)
+eval/            questions.json (development set), questions_test_v2.json (held-out test set)
 reports/         generated results and figures (committed)
-tests/           77 tests
+tests/           103 tests
 ```
