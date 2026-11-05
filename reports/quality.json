@@ -1,0 +1,70 @@
+{
+  "dbt": {
+    "success": true,
+    "by_type": {
+      "model": {
+        "success": 10
+      },
+      "seed": {
+        "success": 1
+      },
+      "test": {
+        "pass": 34
+      }
+    },
+    "failures": [],
+    "n_tests": 34
+  },
+  "quality": {
+    "staged_rows": 472293,
+    "fact_rows": 467073,
+    "quarantined_rows": 5220,
+    "quarantined_share": 0.01105,
+    "by_reason": {
+      "bad_timestamp": 439,
+      "duplicate": 2732,
+      "missing_price": 478,
+      "out_of_range": 1352,
+      "unknown_fuel": 219
+    },
+    "rows_conserved": true,
+    "injected_defects": {
+      "injected": 5220,
+      "caught": 5220,
+      "recall": 1.0,
+      "false_positives": 0,
+      "per_type": {
+        "bad_timestamp": {
+          "injected": 439,
+          "caught": 439,
+          "recall": 1.0
+        },
+        "duplicate": {
+          "injected": 2732,
+          "caught": 2732,
+          "recall": 1.0
+        },
+        "missing_price": {
+          "injected": 478,
+          "caught": 478,
+          "recall": 1.0
+        },
+        "price_typo": {
+          "injected": 901,
+          "caught": 901,
+          "recall": 1.0
+        },
+        "unknown_fuel": {
+          "injected": 219,
+          "caught": 219,
+          "recall": 1.0
+        },
+        "zero_price": {
+          "injected": 451,
+          "caught": 451,
+          "recall": 1.0
+        }
+      }
+    }
+  }
+}
