@@ -64,10 +64,13 @@ class SqlTool:
 
     # -------------------------------------------------------------------------- tools
     def extreme(self, fuel: str, zone: Zone, days: int, k: int = 1,
-                cheapest: bool = True, end: date | None = None) -> ToolResult:
+                cheapest: bool = True, end: date | None = None,
+                autoroute: bool = False) -> ToolResult:
         """Stations ranked by their latest price in the window."""
         start, end = self.window(days, end)
         zsql, zp = _zone_sql(zone)
+        if autoroute:
+            zsql += " and autoroute"
         order = "asc" if cheapest else "desc"
         sql = f"""
             with w as (
@@ -85,10 +88,13 @@ class SqlTool:
         return ToolResult("cheapest" if cheapest else "most_expensive", sql, params,
                           self._query(sql, params), {"start": start, "end": end})
 
-    def average(self, fuel: str, zone: Zone, days: int, end: date | None = None) -> ToolResult:
+    def average(self, fuel: str, zone: Zone, days: int, end: date | None = None,
+                autoroute: bool = False) -> ToolResult:
         """Mean of the daily prices observed in the window, and how many stations they cover."""
         start, end = self.window(days, end)
         zsql, zp = _zone_sql(zone)
+        if autoroute:
+            zsql += " and autoroute"
         sql = f"""
             select avg(prix_eur) as prix_moyen, count(*) as n_releves,
                    count(distinct pdv_id) as n_stations

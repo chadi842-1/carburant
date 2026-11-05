@@ -62,6 +62,8 @@ class Parsed:
     zone: Zone
     days: int
     k: int
+    autoroute: bool = False
+    confidence: float | None = None
 
 
 def _search(patterns: list[str], text: str) -> bool:
@@ -192,12 +194,29 @@ def route_node(state: State, resolver: ZoneResolver) -> dict:
     return {"q": q, "parsed": parsed}
 
 
+def route_node_ml(state: State, resolver: ZoneResolver, model) -> dict:
+    """Router v2: learned intent classifier + improved slot extraction (see intent.py)."""
+    from .intent import parse_autoroute, parse_days_v2, parse_fuel_v2, parse_k_v2
+
+    q = normalize(state["question"])
+    intent, conf = model.predict(state["question"])
+    if intent == "out_of_scope" or conf < model.threshold:
+        intent = "abstain"
+    fuel = parse_fuel_v2(q)
+    needs_fuel = intent in {"cheapest", "most_expensive", "average", "trend", "motorway_gap"}
+    parsed = Parsed(intent, fuel or ("Gazole" if needs_fuel else None),
+                    needs_fuel and fuel is None, resolver.resolve(q), parse_days_v2(q),
+                    parse_k_v2(q), parse_autoroute(q, intent), round(conf, 4))
+    return {"q": q, "parsed": parsed}
+
+
 def sql_node(state: State, tool: SqlTool) -> dict:
     p = state["parsed"]
     if p.intent in ("cheapest", "most_expensive"):
-        res = tool.extreme(p.fuel, p.zone, p.days, p.k, cheapest=p.intent == "cheapest")
+        res = tool.extreme(p.fuel, p.zone, p.days, p.k, cheapest=p.intent == "cheapest",
+                           autoroute=p.autoroute)
     elif p.intent == "average":
-        res = tool.average(p.fuel, p.zone, p.days)
+        res = tool.average(p.fuel, p.zone, p.days, autoroute=p.autoroute)
     elif p.intent == "trend":
         res = tool.trend(p.fuel, p.zone, max(p.days, 14))
     elif p.intent == "count_stations":
@@ -231,6 +250,8 @@ def compose_node(state: State, min_score: float, min_terms: int,
         ans.intent = "abstain"
         ans.answer = ("Je ne sais pas répondre à cette question avec les données et la "
                       "documentation disponibles.")
+    if p.confidence is not None:
+        ans.data["intent_confidence"] = p.confidence
     if llm_fn is not None and ans.grounded:
         ans.answer = llm_fn(question, {"answer": ans.answer, "data": ans.data})
     return {"answer": ans}
@@ -238,7 +259,7 @@ def compose_node(state: State, min_score: float, min_terms: int,
 
 def _compose_sql(ans: Answer, p: Parsed, tool: ToolResult) -> None:
     rows, meta = tool.rows, tool.meta
-    where = _where(p.zone)
+    where = _where(p.zone) + (" (stations d'autoroute)" if p.autoroute else "")
     note = " (carburant non précisé : Gazole par défaut)" if p.fuel_defaulted else ""
     ans.sources = [Source(kind="sql", ref=tool.name, detail=" ".join(tool.sql.split()))]
     if meta.get("missing"):
@@ -334,23 +355,40 @@ def _where(zone: Zone) -> str:
     return f"dans le département {zone.label}"
 
 
+def _next_step(state: State) -> str:
+    intent = state["parsed"].intent
+    return {"doc": "rag", "abstain": "compose"}.get(intent, "sql")
+
+
 class Agent:
+    """router='rules' is the v1 rule set (frozen); router='ml' is the learned classifier."""
+
     def __init__(self, paths: Paths | None = None, min_score: float = 3.0, min_terms: int = 1,
-                 llm_fn: Callable[[str, dict], str] | None = None):
+                 llm_fn: Callable[[str, dict], str] | None = None, router: str = "ml",
+                 intent_model=None):
         self.paths = paths or get_paths()
         self.tool = SqlTool(self.paths)
         self.retriever = Retriever()
         self.resolver = ZoneResolver(self.tool.gazetteer())
+        self.router = router
         g = StateGraph(State)
-        g.add_node("route", partial(route_node, resolver=self.resolver))
+        if router == "ml":
+            from .intent import train
+
+            self.intent_model = intent_model or train()
+            g.add_node("route", partial(route_node_ml, resolver=self.resolver,
+                                        model=self.intent_model))
+        elif router == "rules":
+            g.add_node("route", partial(route_node, resolver=self.resolver))
+        else:
+            raise ValueError(f"unknown router {router!r}")
         g.add_node("sql", partial(sql_node, tool=self.tool))
         g.add_node("rag", partial(rag_node, retriever=self.retriever))
         g.add_node("compose", partial(compose_node, min_score=min_score, min_terms=min_terms,
                                       llm_fn=llm_fn))
         g.add_edge(START, "route")
-        g.add_conditional_edges(
-            "route", lambda s: "rag" if s["parsed"].intent == "doc" else "sql",
-            {"rag": "rag", "sql": "sql"})
+        g.add_conditional_edges("route", _next_step,
+                                {"rag": "rag", "sql": "sql", "compose": "compose"})
         g.add_edge("sql", "compose")
         g.add_edge("rag", "compose")
         g.add_edge("compose", END)
