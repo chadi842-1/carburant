@@ -14,6 +14,11 @@ def _pct(x: float, d: int = 1) -> str:
     return f"{x * 100:.{d}f} %"
 
 
+def _band(b: dict) -> str:
+    """Recall for one size band; a band with no injected anomaly has no recall."""
+    return "n/a (n=0)" if b["recall"] is None else f"{b['recall']:.2f} (n={b['n']})"
+
+
 def render_results(paths: Paths) -> str:
     cfg = _load(paths, "run_config.json")
     q = _load(paths, "quality.json")
@@ -54,7 +59,7 @@ def render_results(paths: Paths) -> str:
         L.append(f"| {name} | {m['precision']:.2f} [{ci['precision'][0]:.2f}, "
                  f"{ci['precision'][1]:.2f}] | {m['recall']:.2f} [{ci['recall'][0]:.2f}, "
                  f"{ci['recall'][1]:.2f}] | {m['f1']:.2f} | {m['pr_auc']:.2f} | "
-                 + " | ".join(f"{rb[b]['recall']:.2f} (n={rb[b]['n']})" for b in rb) + " |")
+                 + " | ".join(_band(rb[b]) for b in rb) + " |")
     cf = an["clean_data_flags"]
     L += ["", f"On the data **without** injected anomalies the rule flags {cf['flagged']:,} of "
           f"{cf['rows']:,} daily prices ({_pct(cf['false_alarm_rate'], 2)}), all false alarms "
