@@ -68,7 +68,7 @@ def run_dbt(paths: Paths, command: str = "build", dbt_dir: Path = DBT_DIR) -> di
     args = [_dbt_executable(), command, "--project-dir", str(dbt_dir),
             "--profiles-dir", str(dbt_dir), "--target-path", str(target_dir),
             "--log-path", str(paths.warehouse_dir / "dbt_logs"), "--quiet"]
-    with _env(CARBURANT_DUCKDB=paths.warehouse):
+    with _env(CARBURANT_DUCKDB=paths.warehouse, DO_NOT_TRACK=1):   # no dbt telemetry
         proc = subprocess.run(args, capture_output=True, text=True)
     results_file = target_dir / "run_results.json"
     if not results_file.exists():

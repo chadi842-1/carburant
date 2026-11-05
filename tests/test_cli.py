@@ -8,7 +8,7 @@ from carburant.report import render_results
 def test_run_end_to_end_writes_every_report(tmp_path):
     main(["--root", str(tmp_path), "run", "--stations", "80", "--days", "30", "--seed", "3"])
     rep = tmp_path / "reports"
-    for f in ("run_config.json", "quality.json", "anomaly_metrics.json", "agent_eval.json",
+    for f in ("run_config.json", "quality.json", "anomaly_metrics.json", "agent_eval_compare.json",
               "anomaly_eval.png", "dashboard.png", "results.md"):
         assert (rep / f).exists(), f
     md = (rep / "results.md").read_text(encoding="utf-8")

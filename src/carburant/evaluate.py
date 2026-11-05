@@ -25,7 +25,8 @@ import pandas as pd
 from .agent import Agent
 from .config import Paths, get_paths
 
-EVAL_FILE = Path(__file__).resolve().parents[2] / "eval" / "questions.json"
+EVAL_FILE = Path(__file__).resolve().parents[2] / "eval" / "questions.json"          # dev set
+TEST_FILE = EVAL_FILE.with_name("questions_test_v2.json")                          # held out
 TOL = 5e-4
 
 
@@ -123,7 +124,7 @@ def score_data(spec: dict, expected: dict, ans) -> tuple[bool, str]:
 
 
 def run_eval(paths: Paths | None = None, eval_file: Path = EVAL_FILE,
-             agent: Agent | None = None) -> dict:
+             agent: Agent | None = None, out_name: str = "agent_eval.json") -> dict:
     paths = paths or get_paths()
     agent = agent or Agent(paths)
     oracle = Oracle(paths)
@@ -162,7 +163,27 @@ def run_eval(paths: Paths | None = None, eval_file: Path = EVAL_FILE,
         "failures": df.loc[~df["correct"], ["id", "question", "why"]].to_dict("records"),
     }
     paths.reports.mkdir(parents=True, exist_ok=True)
-    (paths.reports / "agent_eval.json").write_text(
+    (paths.reports / out_name).write_text(
         json.dumps({"summary": summary, "questions": rows}, indent=2, ensure_ascii=False,
                    default=str), encoding="utf-8")
     return summary
+
+
+def compare_routers(paths: Paths | None = None) -> dict:
+    """Both routers on the development set and on the held-out test set.
+
+    Writes reports/agent_eval_{router}_{set}.json and reports/agent_eval_compare.json.
+    """
+    from .intent import train
+
+    paths = paths or get_paths()
+    model = train()
+    out = {}
+    for router in ("rules", "ml"):
+        agent = Agent(paths, router=router, intent_model=model if router == "ml" else None)
+        for name, f in (("dev", EVAL_FILE), ("test", TEST_FILE)):
+            s = run_eval(paths, f, agent, out_name=f"agent_eval_{router}_{name}.json")
+            out[f"{router}/{name}"] = s
+    (paths.reports / "agent_eval_compare.json").write_text(
+        json.dumps(out, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
+    return out

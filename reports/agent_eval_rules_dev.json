@@ -1,0 +1,619 @@
+{
+  "summary": {
+    "n_questions": 45,
+    "accuracy": 0.8,
+    "accuracy_by_kind": {
+      "data": {
+        "n": 28,
+        "correct": 21,
+        "accuracy": 0.75
+      },
+      "doc": {
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9167
+      },
+      "out_of_scope": {
+        "n": 5,
+        "correct": 4,
+        "accuracy": 0.8
+      }
+    },
+    "grounded_rate": 1.0,
+    "hallucinated_out_of_scope": 1,
+    "latency_ms": {
+      "median": 34.0,
+      "p95": 39.8,
+      "max": 71.0
+    },
+    "failures": [
+      {
+        "id": "q03",
+        "question": "Je cherche du E10 pas cher à Bordeaux, quelle station ?",
+        "why": "routed to average"
+      },
+      {
+        "id": "q05",
+        "question": "Top 3 des stations les plus chères en gazole à Paris",
+        "why": "got [('75001040', 2.101)] want [('75001040', 2.101), ('75001567', 2.099), ('75000725', 2.097)]"
+      },
+      {
+        "id": "q12",
+        "question": "Le prix du SP95-E10 à Strasbourg ?",
+        "why": "got 1.931818181818182 want 1.8849892473118284"
+      },
+      {
+        "id": "q14",
+        "question": "Le SP98 a-t-il augmenté en Bretagne ces 30 derniers jours ?",
+        "why": "routed to average"
+      },
+      {
+        "id": "q20",
+        "question": "Le SP98 est-il plus cher sur autoroute dans les Bouches-du-Rhône ?",
+        "why": "routed to most_expensive"
+      },
+      {
+        "id": "q21",
+        "question": "Y a-t-il eu des prix anormaux à Lyon ce mois-ci ?",
+        "why": "routed to abstain"
+      },
+      {
+        "id": "q27",
+        "question": "Quel est le prix moyen du SP98 sur autoroute ?",
+        "why": "got 1.9979244398124008 want 2.132419141914191"
+      },
+      {
+        "id": "d08",
+        "question": "Quel encodage utilisent les fichiers XML ?",
+        "why": "top source donnees#unites (intent doc)"
+      },
+      {
+        "id": "o03",
+        "question": "Combien coûte un billet de train Paris-Lyon ?",
+        "why": "answered as average"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "kind": "data",
+      "question": "Où faire le plein de gazole le moins cher à Toulouse cette semaine ?",
+      "correct": true,
+      "why": "",
+      "intent": "cheapest",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 37.31,
+      "answer": "Station la moins chère pour le Gazole à Toulouse du 20/11 (exclu) au 27/11/2026 : 31000879 (Toulouse) : 1,783 €/l le 27/11."
+    },
+    {
+      "id": "q02",
+      "kind": "data",
+      "question": "Station la moins chère en SP98 à Nice aujourd'hui",
+      "correct": true,
+      "why": "",
+      "intent": "cheapest",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 39.78,
+      "answer": "Station la moins chère pour le SP98 à Nice du 26/11 (exclu) au 27/11/2026 : 6001837 (Nice) : 1,991 €/l le 27/11."
+    },
+    {
+      "id": "q03",
+      "kind": "data",
+      "question": "Je cherche du E10 pas cher à Bordeaux, quelle station ?",
+      "correct": false,
+      "why": "routed to average",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 34.79,
+      "answer": "Prix moyen du E10 à Bordeaux du 20/11 (exclu) au 27/11/2026 : 1,881 €/l (moyenne de 175 relevés journaliers, 66 stations)."
+    },
+    {
+      "id": "q04",
+      "kind": "data",
+      "question": "Les 5 stations les moins chères pour le diesel dans le Nord",
+      "correct": true,
+      "why": "",
+      "intent": "cheapest",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 36.37,
+      "answer": "Les 5 stations les moins chères pour le Gazole dans le département Nord du 20/11 (exclu) au 27/11/2026 : 59000227 (Lille) : 1,735 €/l le 26/11 ; 59001398 (Lille) : 1,746 €/l le 27/11 ; 59000957 (Lille) : 1,751 €/l le 26/11 ; 59000057 (Lille) : 1,757 €/l le 27/11 ; 59001999 (Lille) : 1,760 €/l le 27/11."
+    },
+    {
+      "id": "q05",
+      "kind": "data",
+      "question": "Top 3 des stations les plus chères en gazole à Paris",
+      "correct": false,
+      "why": "got [('75001040', 2.101)] want [('75001040', 2.101), ('75001567', 2.099), ('75000725', 2.097)]",
+      "intent": "most_expensive",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 39.65,
+      "answer": "Station la plus chère pour le Gazole à Paris du 20/11 (exclu) au 27/11/2026 : 75001040 (Paris, autoroute) : 2,101 €/l le 27/11."
+    },
+    {
+      "id": "q06",
+      "kind": "data",
+      "question": "Quel est le tarif le plus élevé du SP95 en Occitanie cette semaine ?",
+      "correct": true,
+      "why": "",
+      "intent": "most_expensive",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 38.78,
+      "answer": "Station la plus chère pour le SP95 en Occitanie du 20/11 (exclu) au 27/11/2026 : 31001264 (Toulouse, autoroute) : 2,093 €/l le 24/11."
+    },
+    {
+      "id": "q07",
+      "kind": "data",
+      "question": "Prix moyen du gazole à Rennes",
+      "correct": true,
+      "why": "",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 36.19,
+      "answer": "Prix moyen du Gazole à Rennes du 20/11 (exclu) au 27/11/2026 : 1,828 €/l (moyenne de 189 relevés journaliers, 78 stations)."
+    },
+    {
+      "id": "q08",
+      "kind": "data",
+      "question": "Combien coûte le litre de SP98 en moyenne en Île-de-France sur les 30 derniers jours ?",
+      "correct": true,
+      "why": "",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 36.43,
+      "answer": "Prix moyen du SP98 en Île-de-France du 28/10 (exclu) au 27/11/2026 : 2,049 €/l (moyenne de 2400 relevés journaliers, 229 stations)."
+    },
+    {
+      "id": "q09",
+      "kind": "data",
+      "question": "Quel est le prix du GPL en Auvergne-Rhône-Alpes ?",
+      "correct": true,
+      "why": "",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 34.39,
+      "answer": "Prix moyen du GPLc en Auvergne-Rhône-Alpes du 20/11 (exclu) au 27/11/2026 : 1,145 €/l (moyenne de 112 relevés journaliers, 45 stations)."
+    },
+    {
+      "id": "q10",
+      "kind": "data",
+      "question": "Prix moyen de l'E85 dans le département 59",
+      "correct": true,
+      "why": "",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 36.19,
+      "answer": "Prix moyen du E85 dans le département 59 du 20/11 (exclu) au 27/11/2026 : 0,965 €/l (moyenne de 149 relevés journaliers, 57 stations)."
+    },
+    {
+      "id": "q11",
+      "kind": "data",
+      "question": "En moyenne, combien vaut le gazole en France aujourd'hui ?",
+      "correct": true,
+      "why": "",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 34.34,
+      "answer": "Prix moyen du Gazole en France du 26/11 (exclu) au 27/11/2026 : 1,857 €/l (moyenne de 687 relevés journaliers, 687 stations)."
+    },
+    {
+      "id": "q12",
+      "kind": "data",
+      "question": "Le prix du SP95-E10 à Strasbourg ?",
+      "correct": false,
+      "why": "got 1.931818181818182 want 1.8849892473118284",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 34.2,
+      "answer": "Prix moyen du SP95 à Strasbourg du 20/11 (exclu) au 27/11/2026 : 1,932 €/l (moyenne de 121 relevés journaliers, 48 stations)."
+    },
+    {
+      "id": "q13",
+      "kind": "data",
+      "question": "Comment a évolué le prix du gazole à Marseille sur le dernier mois ?",
+      "correct": true,
+      "why": "",
+      "intent": "trend",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 33.87,
+      "answer": "Évolution du Gazole à Marseille du 28/10 (exclu) au 27/11/2026 : hausse de 0,7 centimes (1,871 €/l en moyenne la première semaine, 1,878 €/l la dernière)."
+    },
+    {
+      "id": "q14",
+      "kind": "data",
+      "question": "Le SP98 a-t-il augmenté en Bretagne ces 30 derniers jours ?",
+      "correct": false,
+      "why": "routed to average",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 35.33,
+      "answer": "Prix moyen du SP98 en Bretagne du 28/10 (exclu) au 27/11/2026 : 1,974 €/l (moyenne de 1295 relevés journaliers, 122 stations)."
+    },
+    {
+      "id": "q15",
+      "kind": "data",
+      "question": "Tendance du prix de l'E10 en France sur 15 jours",
+      "correct": true,
+      "why": "",
+      "intent": "trend",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 34.4,
+      "answer": "Évolution du E10 en France du 13/11 (exclu) au 27/11/2026 : baisse de 0,5 centimes (1,894 €/l en moyenne la première semaine, 1,889 €/l la dernière)."
+    },
+    {
+      "id": "q16",
+      "kind": "data",
+      "question": "Combien de stations à Lille ?",
+      "correct": true,
+      "why": "",
+      "intent": "count_stations",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 35.26,
+      "answer": "219 stations ont publié un prix à Lille du 20/11 (exclu) au 27/11/2026."
+    },
+    {
+      "id": "q17",
+      "kind": "data",
+      "question": "Nombre de stations qui vendent de l'E85 en Gironde",
+      "correct": true,
+      "why": "",
+      "intent": "count_stations",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 32.09,
+      "answer": "15 stations vendant du E85 ont publié un prix dans le département Gironde du 20/11 (exclu) au 27/11/2026."
+    },
+    {
+      "id": "q18",
+      "kind": "data",
+      "question": "Combien de stations ont publié un prix de GPL en France ce mois ?",
+      "correct": true,
+      "why": "",
+      "intent": "count_stations",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 32.65,
+      "answer": "300 stations vendant du GPLc ont publié un prix en France du 28/10 (exclu) au 27/11/2026."
+    },
+    {
+      "id": "q19",
+      "kind": "data",
+      "question": "Quel est l'écart de prix entre autoroute et route pour le gazole ?",
+      "correct": true,
+      "why": "",
+      "intent": "motorway_gap",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 33.42,
+      "answer": "Sur autoroute, le Gazole coûte en moyenne 2,004 €/l contre 1,855 €/l sur route en France du 20/11 (exclu) au 27/11/2026, soit +14,9 centimes."
+    },
+    {
+      "id": "q20",
+      "kind": "data",
+      "question": "Le SP98 est-il plus cher sur autoroute dans les Bouches-du-Rhône ?",
+      "correct": false,
+      "why": "routed to most_expensive",
+      "intent": "most_expensive",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 35.22,
+      "answer": "Station la plus chère pour le SP98 dans le département Bouches-du-Rhône du 20/11 (exclu) au 27/11/2026 : 13000470 (Marseille, autoroute) : 2,213 €/l le 26/11."
+    },
+    {
+      "id": "q21",
+      "kind": "data",
+      "question": "Y a-t-il eu des prix anormaux à Lyon ce mois-ci ?",
+      "correct": false,
+      "why": "routed to abstain",
+      "intent": "abstain",
+      "answered": false,
+      "cited": false,
+      "latency_ms": 1.78,
+      "answer": "Je ne sais pas répondre à cette question avec les données et la documentation disponibles."
+    },
+    {
+      "id": "q22",
+      "kind": "data",
+      "question": "Combien de prix suspects pour le gazole cette semaine ?",
+      "correct": true,
+      "why": "",
+      "intent": "anomalies",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 67.02,
+      "answer": "0 prix suspect (Gazole) en France du 20/11 (exclu) au 27/11/2026."
+    },
+    {
+      "id": "q23",
+      "kind": "data",
+      "question": "Liste les anomalies de prix en Normandie sur 30 jours",
+      "correct": true,
+      "why": "",
+      "intent": "anomalies",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 70.95,
+      "answer": "1 prix suspect en Normandie du 28/10 (exclu) au 27/11/2026. Les plus marqués : 76001371 E10 1,749 €/l le 20/11 (-5,7 % vs pairs)."
+    },
+    {
+      "id": "q24",
+      "kind": "data",
+      "question": "Quelle est la station la moins chère en SP95 dans le département 13 ?",
+      "correct": true,
+      "why": "",
+      "intent": "cheapest",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 36.76,
+      "answer": "Station la moins chère pour le SP95 dans le département 13 du 20/11 (exclu) au 27/11/2026 : 13000123 (Marseille) : 1,868 €/l le 27/11."
+    },
+    {
+      "id": "q25",
+      "kind": "data",
+      "question": "Station la plus chère pour l'E85 à Grenoble ce mois",
+      "correct": true,
+      "why": "",
+      "intent": "most_expensive",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 33.79,
+      "answer": "Station la plus chère pour le E85 à Grenoble du 28/10 (exclu) au 27/11/2026 : 38001093 (Grenoble) : 1,052 €/l le 26/11."
+    },
+    {
+      "id": "q26",
+      "kind": "data",
+      "question": "Prix moyen du gazole à Clermont-Ferrand cette semaine",
+      "correct": true,
+      "why": "",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 34.48,
+      "answer": "Prix moyen du Gazole à Clermont-Ferrand du 20/11 (exclu) au 27/11/2026 : 1,854 €/l (moyenne de 190 relevés journaliers, 71 stations)."
+    },
+    {
+      "id": "q27",
+      "kind": "data",
+      "question": "Quel est le prix moyen du SP98 sur autoroute ?",
+      "correct": false,
+      "why": "got 1.9979244398124008 want 2.132419141914191",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 34.04,
+      "answer": "Prix moyen du SP98 en France du 20/11 (exclu) au 27/11/2026 : 1,998 €/l (moyenne de 3838 relevés journaliers, 1511 stations)."
+    },
+    {
+      "id": "q28",
+      "kind": "data",
+      "question": "Les deux stations les moins chères en gazole à Nantes",
+      "correct": true,
+      "why": "",
+      "intent": "cheapest",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 37.19,
+      "answer": "Les 2 stations les moins chères pour le Gazole à Nantes du 20/11 (exclu) au 27/11/2026 : 44000500 (Nantes) : 1,771 €/l le 26/11 ; 44000214 (Nantes) : 1,775 €/l le 26/11."
+    },
+    {
+      "id": "d01",
+      "kind": "doc",
+      "question": "Que deviennent les lignes dont le prix est hors plage ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.47,
+      "answer": "Chaque ligne de prix est vérifiée par le modèle dbt stg_prix. La première règle enfreinte donne la raison de quarantaine : unknown_fuel si le carburant n'appartient pas au catalogue officiel, bad_timestamp si la date de mise à jour est illisible, missing_price si la valeur est vide, out_of_range si le prix est hors de la plage plausible de 0,30 à 4,00 euros par litre, duplicate si la même publication apparaît plusieurs fois. Les lignes valides vont dans fct_prix, les autres dans quarantine_prix avec leur raison."
+    },
+    {
+      "id": "d02",
+      "kind": "doc",
+      "question": "Comment le pipeline est-il orchestré chaque jour ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.13,
+      "answer": "Un DAG Airflow quotidien enchaîne l'ingestion, le staging, le chargement, dbt build puis la détection d'anomalies. Si un test dbt bloquant échoue, les tâches suivantes ne s'exécutent pas et les données de la veille restent exposées."
+    },
+    {
+      "id": "d03",
+      "kind": "doc",
+      "question": "Quels tests dbt sont déclarés ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.06,
+      "answer": "Le projet déclare des tests d'unicité, de non-nullité, d'intégrité référentielle entre faits et dimensions, de valeurs acceptées, de plage de prix et d'unicité de la combinaison station, carburant, horodatage. Un test en sévérité warn signale les variations de plus de 50 % d'un jour à l'autre sans bloquer le pipeline."
+    },
+    {
+      "id": "d04",
+      "kind": "doc",
+      "question": "Pourquoi les stations d'autoroute sont-elles comparées entre elles ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.28,
+      "answer": "L'attribut pop vaut A pour une station sur autoroute et R pour une station sur route. Les stations d'autoroute pratiquent en général des prix plus élevés, c'est pourquoi la détection d'anomalies compare une station à des pairs du même type de route."
+    },
+    {
+      "id": "d05",
+      "kind": "doc",
+      "question": "Quelle est la différence entre la règle robuste et l'Isolation Forest ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.32,
+      "answer": "Deux détecteurs utilisent les mêmes variables. La règle robuste calcule des z-scores fondés sur la médiane et l'écart absolu médian, puis retient le plus petit des deux écarts, historique et pairs. L'Isolation Forest est un modèle non supervisé entraîné sur la première moitié de la période."
+    },
+    {
+      "id": "d06",
+      "kind": "doc",
+      "question": "Comment l'agent évite-t-il les injections SQL ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.21,
+      "answer": "L'outil SQL n'exécute que des requêtes paramétrées prédéfinies, en lecture seule, sur les tables mart_prix_journalier et anomalies_prix. Il ne génère jamais de SQL libre, ce qui écarte les injections SQL et les requêtes coûteuses. La période « cette semaine » désigne les sept derniers jours présents dans l'entrepôt."
+    },
+    {
+      "id": "d07",
+      "kind": "doc",
+      "question": "Où sont stockés les fichiers bruts ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.26,
+      "answer": "Les fichiers sont rangés comme dans un bucket Cloud Storage : lake/raw/date=AAAA-MM-JJ/prix.xml. La zone brute conserve les fichiers tels qu'ils ont été publiés, ce qui permet de rejouer tout le pipeline depuis l'origine si une règle de transformation change."
+    },
+    {
+      "id": "d08",
+      "kind": "doc",
+      "question": "Quel encodage utilisent les fichiers XML ?",
+      "correct": false,
+      "why": "top source donnees#unites (intent doc)",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.21,
+      "answer": "La latitude et la longitude sont publiées multipliées par 100000. Le prix est documenté en euros multipliés par 1000 (1799 pour 1,799 euro), mais des fichiers récents utilisent directement des euros décimaux ; le parser accepte les deux formes."
+    },
+    {
+      "id": "d09",
+      "kind": "doc",
+      "question": "Que se passe-t-il quand le prix est saisi 17,99 au lieu de 1,799 ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.38,
+      "answer": "Une erreur fréquente est le glissement de virgule : 17,99 au lieu de 1,799. Le prix sort alors de la plage plausible et la ligne part en quarantaine avec la raison out_of_range."
+    },
+    {
+      "id": "d10",
+      "kind": "doc",
+      "question": "Est-ce que l'assistant utilise un modèle de langage ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.31,
+      "answer": "Le routeur et la rédaction sont déterministes : aucun grand modèle de langage n'est appelé, ce qui rend les réponses reproductibles et testables. Un modèle de langage peut être branché pour reformuler la réponse à partir des résultats déjà calculés, sans pouvoir modifier les chiffres."
+    },
+    {
+      "id": "d11",
+      "kind": "doc",
+      "question": "Comment l'intégration continue est-elle configurée ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.2,
+      "answer": "GitHub Actions lance le linting (ruff) et la suite de tests (pytest, qui construit un petit entrepôt et exécute dbt build) à chaque push et à chaque pull request."
+    },
+    {
+      "id": "d12",
+      "kind": "doc",
+      "question": "Pourquoi les petites anomalies sont-elles mal détectées ?",
+      "correct": true,
+      "why": "",
+      "intent": "doc",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 1.25,
+      "answer": "Les petites anomalies, de 3 à 5 %, sont difficiles à distinguer de la variation normale d'une station et sont rarement détectées. Les anomalies injectées sont ponctuelles : une manipulation durable et progressive ne serait pas détectée de la même façon."
+    },
+    {
+      "id": "o01",
+      "kind": "out_of_scope",
+      "question": "Quel temps fera-t-il à Paris ce week-end ?",
+      "correct": true,
+      "why": "",
+      "intent": "abstain",
+      "answered": false,
+      "cited": false,
+      "latency_ms": 1.23,
+      "answer": "Je ne sais pas répondre à cette question avec les données et la documentation disponibles."
+    },
+    {
+      "id": "o02",
+      "kind": "out_of_scope",
+      "question": "Quel est le cours du Bitcoin ?",
+      "correct": true,
+      "why": "",
+      "intent": "abstain",
+      "answered": false,
+      "cited": false,
+      "latency_ms": 1.17,
+      "answer": "Je ne sais pas répondre à cette question avec les données et la documentation disponibles."
+    },
+    {
+      "id": "o03",
+      "kind": "out_of_scope",
+      "question": "Combien coûte un billet de train Paris-Lyon ?",
+      "correct": false,
+      "why": "answered as average",
+      "intent": "average",
+      "answered": true,
+      "cited": true,
+      "latency_ms": 36.98,
+      "answer": "Prix moyen du Gazole à Paris du 20/11 (exclu) au 27/11/2026 (carburant non précisé : Gazole par défaut) : 1,916 €/l (moyenne de 491 relevés journaliers, 189 stations)."
+    },
+    {
+      "id": "o04",
+      "kind": "out_of_scope",
+      "question": "Recommande-moi un bon restaurant à Lyon",
+      "correct": true,
+      "why": "",
+      "intent": "abstain",
+      "answered": false,
+      "cited": false,
+      "latency_ms": 1.43,
+      "answer": "Je ne sais pas répondre à cette question avec les données et la documentation disponibles."
+    },
+    {
+      "id": "o05",
+      "kind": "out_of_scope",
+      "question": "Qui est le ministre de l'économie ?",
+      "correct": true,
+      "why": "",
+      "intent": "abstain",
+      "answered": false,
+      "cited": false,
+      "latency_ms": 1.29,
+      "answer": "Je ne sais pas répondre à cette question avec les données et la documentation disponibles."
+    }
+  ]
+}

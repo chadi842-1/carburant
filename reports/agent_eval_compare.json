@@ -1,0 +1,257 @@
+{
+  "rules/dev": {
+    "n_questions": 45,
+    "accuracy": 0.8,
+    "accuracy_by_kind": {
+      "data": {
+        "n": 28,
+        "correct": 21,
+        "accuracy": 0.75
+      },
+      "doc": {
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9167
+      },
+      "out_of_scope": {
+        "n": 5,
+        "correct": 4,
+        "accuracy": 0.8
+      }
+    },
+    "grounded_rate": 1.0,
+    "hallucinated_out_of_scope": 1,
+    "latency_ms": {
+      "median": 34.0,
+      "p95": 39.8,
+      "max": 71.0
+    },
+    "failures": [
+      {
+        "id": "q03",
+        "question": "Je cherche du E10 pas cher à Bordeaux, quelle station ?",
+        "why": "routed to average"
+      },
+      {
+        "id": "q05",
+        "question": "Top 3 des stations les plus chères en gazole à Paris",
+        "why": "got [('75001040', 2.101)] want [('75001040', 2.101), ('75001567', 2.099), ('75000725', 2.097)]"
+      },
+      {
+        "id": "q12",
+        "question": "Le prix du SP95-E10 à Strasbourg ?",
+        "why": "got 1.931818181818182 want 1.8849892473118284"
+      },
+      {
+        "id": "q14",
+        "question": "Le SP98 a-t-il augmenté en Bretagne ces 30 derniers jours ?",
+        "why": "routed to average"
+      },
+      {
+        "id": "q20",
+        "question": "Le SP98 est-il plus cher sur autoroute dans les Bouches-du-Rhône ?",
+        "why": "routed to most_expensive"
+      },
+      {
+        "id": "q21",
+        "question": "Y a-t-il eu des prix anormaux à Lyon ce mois-ci ?",
+        "why": "routed to abstain"
+      },
+      {
+        "id": "q27",
+        "question": "Quel est le prix moyen du SP98 sur autoroute ?",
+        "why": "got 1.9979244398124008 want 2.132419141914191"
+      },
+      {
+        "id": "d08",
+        "question": "Quel encodage utilisent les fichiers XML ?",
+        "why": "top source donnees#unites (intent doc)"
+      },
+      {
+        "id": "o03",
+        "question": "Combien coûte un billet de train Paris-Lyon ?",
+        "why": "answered as average"
+      }
+    ]
+  },
+  "rules/test": {
+    "n_questions": 45,
+    "accuracy": 0.7333,
+    "accuracy_by_kind": {
+      "data": {
+        "n": 28,
+        "correct": 19,
+        "accuracy": 0.6786
+      },
+      "doc": {
+        "n": 10,
+        "correct": 10,
+        "accuracy": 1.0
+      },
+      "out_of_scope": {
+        "n": 7,
+        "correct": 4,
+        "accuracy": 0.5714
+      }
+    },
+    "grounded_rate": 1.0,
+    "hallucinated_out_of_scope": 3,
+    "latency_ms": {
+      "median": 33.4,
+      "p95": 38.3,
+      "max": 69.3
+    },
+    "failures": [
+      {
+        "id": "t03",
+        "question": "Je veux faire le plein de SP98 pas cher à Nantes",
+        "why": "routed to average"
+      },
+      {
+        "id": "t06",
+        "question": "Top 5 des stations les plus chères en gazole en Île-de-France",
+        "why": "got [('75001040', 2.101)] want [('75001040', 2.101), ('75001567', 2.099), ('75000725', 2.097), ('75000594', 2.096), ('75000349', 2.088)]"
+      },
+      {
+        "id": "t13",
+        "question": "Combien coûte le gazole sur autoroute en moyenne ?",
+        "why": "got 1.8653834154351376 want 2.0038632478632477"
+      },
+      {
+        "id": "t14",
+        "question": "Le prix du SP95-E10 à Reims",
+        "why": "got 1.9384871794871794 want 1.8782982456140351"
+      },
+      {
+        "id": "t15",
+        "question": "Le gazole a-t-il baissé à Bordeaux ce mois-ci ?",
+        "why": "routed to doc"
+      },
+      {
+        "id": "t17",
+        "question": "Est-ce que le SP98 monte ou descend en France depuis deux semaines ?",
+        "why": "routed to doc"
+      },
+      {
+        "id": "t20",
+        "question": "Combien de points de vente d'E85 dans les Alpes-Maritimes ?",
+        "why": "routed to average"
+      },
+      {
+        "id": "t26",
+        "question": "Des prix bizarres détectés en Hauts-de-France cette semaine ?",
+        "why": "routed to doc"
+      },
+      {
+        "id": "t27",
+        "question": "La station la moins chère pour le gazole sur autoroute en France",
+        "why": "got [('76001730', 1.73)] want [('35000024', 1.877)]"
+      },
+      {
+        "id": "v01",
+        "question": "Combien coûte un abonnement de métro à Paris ?",
+        "why": "answered as average"
+      },
+      {
+        "id": "v02",
+        "question": "Quel est le prix moyen d'un appartement à Lyon ?",
+        "why": "answered as average"
+      },
+      {
+        "id": "v05",
+        "question": "Combien de stations de métro à Lille ?",
+        "why": "answered as count_stations"
+      }
+    ]
+  },
+  "ml/dev": {
+    "n_questions": 45,
+    "accuracy": 0.9778,
+    "accuracy_by_kind": {
+      "data": {
+        "n": 28,
+        "correct": 28,
+        "accuracy": 1.0
+      },
+      "doc": {
+        "n": 12,
+        "correct": 11,
+        "accuracy": 0.9167
+      },
+      "out_of_scope": {
+        "n": 5,
+        "correct": 5,
+        "accuracy": 1.0
+      }
+    },
+    "grounded_rate": 1.0,
+    "hallucinated_out_of_scope": 0,
+    "latency_ms": {
+      "median": 35.4,
+      "p95": 64.0,
+      "max": 73.9
+    },
+    "failures": [
+      {
+        "id": "d08",
+        "question": "Quel encodage utilisent les fichiers XML ?",
+        "why": "top source donnees#unites (intent doc)"
+      }
+    ]
+  },
+  "ml/test": {
+    "n_questions": 45,
+    "accuracy": 0.8889,
+    "accuracy_by_kind": {
+      "data": {
+        "n": 28,
+        "correct": 27,
+        "accuracy": 0.9643
+      },
+      "doc": {
+        "n": 10,
+        "correct": 9,
+        "accuracy": 0.9
+      },
+      "out_of_scope": {
+        "n": 7,
+        "correct": 4,
+        "accuracy": 0.5714
+      }
+    },
+    "grounded_rate": 1.0,
+    "hallucinated_out_of_scope": 3,
+    "latency_ms": {
+      "median": 34.8,
+      "p95": 66.1,
+      "max": 81.0
+    },
+    "failures": [
+      {
+        "id": "t04",
+        "question": "Quelle station vend le diesel au prix le plus bas dans le Finistère ?",
+        "why": "routed to abstain"
+      },
+      {
+        "id": "u10",
+        "question": "Quelle est la règle pour un prix de 17,99 euros ?",
+        "why": "top source None (intent abstain)"
+      },
+      {
+        "id": "v02",
+        "question": "Quel est le prix moyen d'un appartement à Lyon ?",
+        "why": "answered as average"
+      },
+      {
+        "id": "v05",
+        "question": "Combien de stations de métro à Lille ?",
+        "why": "answered as count_stations"
+      },
+      {
+        "id": "v06",
+        "question": "Quel est le prix du baril de Brent aujourd'hui ?",
+        "why": "answered as average"
+      }
+    ]
+  }
+}

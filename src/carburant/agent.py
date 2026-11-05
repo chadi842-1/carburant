@@ -288,6 +288,11 @@ def _compose_sql(ans: Answer, p: Parsed, tool: ToolResult) -> None:
                              for r in rows]}
     elif tool.name == "average":
         r = rows[0]
+        if r["prix_moyen"] is None:                       # aggregate over zero rows
+            ans.grounded = False
+            ans.answer = f"Aucune donnée pour le {p.fuel} {where} {_period(meta)}."
+            ans.data = {"prix_moyen": None, "n_stations": 0}
+            return
         ans.answer = (f"Prix moyen du {p.fuel} {where} {_period(meta)}{note} : "
                       f"{_fmt_price(r['prix_moyen'])} (moyenne de {r['n_releves']} relevés "
                       f"journaliers, {r['n_stations']} stations).")

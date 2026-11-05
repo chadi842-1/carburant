@@ -54,9 +54,9 @@ def step_anomalies(paths: Paths, seed: int) -> dict:
 
 
 def step_eval(paths: Paths) -> dict:
-    from .evaluate import run_eval
+    from .evaluate import compare_routers
 
-    return run_eval(paths)
+    return compare_routers(paths)
 
 
 def step_report(paths: Paths) -> str:
@@ -125,7 +125,8 @@ def main(argv: list[str] | None = None) -> None:
     elif a.cmd == "anomalies":
         out = {k: v for k, v in step_anomalies(paths, SEED).items() if k != "detectors"}
     elif a.cmd == "eval":
-        out = step_eval(paths)
+        out = {k: {m: v[m] for m in ("accuracy", "accuracy_by_kind", "latency_ms")}
+               for k, v in step_eval(paths).items()}
     elif a.cmd == "report":
         out = {"written": step_report(paths)}
     else:

@@ -137,3 +137,20 @@ def test_llm_hook_rewords_without_touching_the_data(built):
 
 def test_latency_is_recorded(agent):
     assert agent.ask("Prix moyen du gazole à Paris ?").latency_ms > 0
+
+
+def test_average_with_no_data_says_so_instead_of_crashing(agent):
+    ans = agent.ask("Prix moyen du GPL dans le département 92 aujourd'hui ?")
+    if ans.intent == "average" and ans.data.get("prix_moyen") is None:
+        assert "Aucune donnée" in ans.answer and not ans.grounded
+    # force the empty case directly through the tool
+    from carburant.agent import Answer, Parsed, _compose_sql
+    from carburant.tools import ToolResult, Zone
+
+    empty = ToolResult("average", "select 1", [], [{"prix_moyen": None, "n_releves": 0,
+                                                     "n_stations": 0}],
+                       {"start": __import__("datetime").date(2026, 1, 1),
+                        "end": __import__("datetime").date(2026, 1, 8)})
+    a = Answer(question="q", intent="average", answer="")
+    _compose_sql(a, Parsed("average", "GPLc", False, Zone(), 7, 1), empty)
+    assert "Aucune donnée" in a.answer and not a.grounded

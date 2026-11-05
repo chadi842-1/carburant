@@ -23,7 +23,7 @@ def render_results(paths: Paths) -> str:
     cfg = _load(paths, "run_config.json")
     q = _load(paths, "quality.json")
     an = _load(paths, "anomaly_metrics.json")
-    ev = _load(paths, "agent_eval.json")["summary"]
+    cmp_ = _load(paths, "agent_eval_compare.json")
     qual, dbt = q["quality"], q["dbt"]
     inj = qual.get("injected_defects", {})
     L = ["# Results", "",
@@ -65,18 +65,26 @@ def render_results(paths: Paths) -> str:
           f"{cf['rows']:,} daily prices ({_pct(cf['false_alarm_rate'], 2)}), all false alarms "
           "by construction.", "", "![Anomaly evaluation](anomaly_eval.png)", "",
           "## Agent (RAG + SQL tool)", "",
-          f"{ev['n_questions']} held-out questions, expected answers from an independent pandas "
-          "oracle. No LLM is called: routing is rule-based.", "",
-          "| Kind | Correct | Accuracy |", "|---|---|---|"]
-    for k, v in ev["accuracy_by_kind"].items():
-        L.append(f"| {k} | {v['correct']} / {v['n']} | {_pct(v['accuracy'], 0)} |")
-    L += [f"| **all** | {sum(v['correct'] for v in ev['accuracy_by_kind'].values())} / "
-          f"{ev['n_questions']} | **{_pct(ev['accuracy'], 0)}** |", "",
-          f"- Answered questions citing a source: {_pct(ev['grounded_rate'], 0)}; out-of-scope "
-          f"questions wrongly answered: {ev['hallucinated_out_of_scope']}.",
-          f"- Latency (warm, in-process, excludes network): median {ev['latency_ms']['median']} "
-          f"ms, p95 {ev['latency_ms']['p95']} ms.", "", "Failures:", ""]
-    L += [f"- `{f['id']}` {f['question']} — {f['why']}" for f in ev["failures"]]
+          "Two routers, same SQL tool and retrieval. **rules** is the v1 rule set (frozen); "
+          "**ml** is a learned intent classifier (TF-IDF + logistic regression on generated "
+          "paraphrases). The development set was used to build v2; the **test** set was "
+          "committed before v2 existed and run once. Expected answers come from an independent "
+          "pandas oracle. No large language model is called.", "",
+          "| Router | Set | Data | Docs | Out of scope | **All** | Out-of-scope answered | "
+          "Median latency |", "|---|---|---|---|---|---|---|---|"]
+    for key, ev in cmp_.items():
+        router, split = key.split("/")
+        k = ev["accuracy_by_kind"]
+        L.append(f"| {router} | {split} | {k['data']['correct']}/{k['data']['n']} | "
+                 f"{k['doc']['correct']}/{k['doc']['n']} | {k['out_of_scope']['correct']}/"
+                 f"{k['out_of_scope']['n']} | **{_pct(ev['accuracy'], 0)}** | "
+                 f"{ev['hallucinated_out_of_scope']} | {ev['latency_ms']['median']} ms |")
+    test = cmp_["ml/test"]
+    L += ["", f"Every answered question cites a source (grounded rate "
+          f"{_pct(test['grounded_rate'], 0)}). The same person wrote the training templates and "
+          "the questions, so these scores are optimistic compared with real users.", "",
+          "Failures of the ml router on the test set:", ""]
+    L += [f"- `{f['id']}` {f['question']} — {f['why']}" for f in test["failures"]]
     L += ["", "## Dashboard", "",
           "`mart_dashboard` is the table a Looker Studio or Power BI report connects to. "
           "No Looker Studio report was built (no GCP access here); this static view is drawn "

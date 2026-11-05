@@ -26,29 +26,24 @@ On the data **without** injected anomalies the rule flags 522 of 467,073 daily p
 
 ## Agent (RAG + SQL tool)
 
-45 held-out questions, expected answers from an independent pandas oracle. No LLM is called: routing is rule-based.
+Two routers, same SQL tool and retrieval. **rules** is the v1 rule set (frozen); **ml** is a learned intent classifier (TF-IDF + logistic regression on generated paraphrases). The development set was used to build v2; the **test** set was committed before v2 existed and run once. Expected answers come from an independent pandas oracle. No large language model is called.
 
-| Kind | Correct | Accuracy |
-|---|---|---|
-| data | 21 / 28 | 75 % |
-| doc | 11 / 12 | 92 % |
-| out_of_scope | 4 / 5 | 80 % |
-| **all** | 36 / 45 | **80 %** |
+| Router | Set | Data | Docs | Out of scope | **All** | Out-of-scope answered | Median latency |
+|---|---|---|---|---|---|---|---|
+| rules | dev | 21/28 | 11/12 | 4/5 | **80 %** | 1 | 34.0 ms |
+| rules | test | 19/28 | 10/10 | 4/7 | **73 %** | 3 | 33.4 ms |
+| ml | dev | 28/28 | 11/12 | 5/5 | **98 %** | 0 | 35.4 ms |
+| ml | test | 27/28 | 9/10 | 4/7 | **89 %** | 3 | 34.8 ms |
 
-- Answered questions citing a source: 100 %; out-of-scope questions wrongly answered: 1.
-- Latency (warm, in-process, excludes network): median 34.2 ms, p95 42.4 ms.
+Every answered question cites a source (grounded rate 100 %). The same person wrote the training templates and the questions, so these scores are optimistic compared with real users.
 
-Failures:
+Failures of the ml router on the test set:
 
-- `q03` Je cherche du E10 pas cher à Bordeaux, quelle station ? — routed to average
-- `q05` Top 3 des stations les plus chères en gazole à Paris — got [('75001040', 2.101)] want [('75001040', 2.101), ('75001567', 2.099), ('75000725', 2.097)]
-- `q12` Le prix du SP95-E10 à Strasbourg ? — got 1.931818181818182 want 1.8849892473118284
-- `q14` Le SP98 a-t-il augmenté en Bretagne ces 30 derniers jours ? — routed to average
-- `q20` Le SP98 est-il plus cher sur autoroute dans les Bouches-du-Rhône ? — routed to most_expensive
-- `q21` Y a-t-il eu des prix anormaux à Lyon ce mois-ci ? — routed to abstain
-- `q27` Quel est le prix moyen du SP98 sur autoroute ? — got 1.9979244398124008 want 2.132419141914191
-- `d08` Quel encodage utilisent les fichiers XML ? — top source donnees#unites (intent doc)
-- `o03` Combien coûte un billet de train Paris-Lyon ? — answered as average
+- `t04` Quelle station vend le diesel au prix le plus bas dans le Finistère ? — routed to abstain
+- `u10` Quelle est la règle pour un prix de 17,99 euros ? — top source None (intent abstain)
+- `v02` Quel est le prix moyen d'un appartement à Lyon ? — answered as average
+- `v05` Combien de stations de métro à Lille ? — answered as count_stations
+- `v06` Quel est le prix du baril de Brent aujourd'hui ? — answered as average
 
 ## Dashboard
 
