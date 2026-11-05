@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: Parsed open-data files, loaded untouched by `carburant load`.
+    tables:
+      - name: prix
+        description: One row per <prix> element of a published file (may contain defects).
+      - name: stations
+        description: One row per <pdv> element per published file.
+      - name: ruptures
+        description: Fuel shortages announced by stations.

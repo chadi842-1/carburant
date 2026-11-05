@@ -1,0 +1,17 @@
+carburant:
+  target: duckdb
+  outputs:
+    duckdb:
+      type: duckdb
+      path: "{{ env_var('CARBURANT_DUCKDB', '../warehouse/carburant.duckdb') }}"
+      threads: 4
+    # Same models on BigQuery: pip install ".[gcp]", authenticate with
+    # `gcloud auth application-default login`, then `dbt build --target bigquery`.
+    # The raw tables must first be loaded into the dataset's `raw` schema (Cloud Storage -> bq load).
+    bigquery:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT', 'my-gcp-project') }}"
+      dataset: carburant
+      location: EU
+      threads: 4

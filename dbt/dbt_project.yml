@@ -1,0 +1,26 @@
+name: carburant
+version: "0.1.0"
+config-version: 2
+profile: carburant
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+vars:
+  price_min: 0.30
+  price_max: 4.00
+
+models:
+  carburant:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+
+seeds:
+  carburant:
+    departements:
+      +column_types:
+        dep: varchar

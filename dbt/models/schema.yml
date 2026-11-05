@@ -1,0 +1,114 @@
+version: 2
+
+models:
+  - name: stg_prix
+    description: Typed staged prices with the first quality rule each row breaks.
+    columns:
+      - name: staging_row_id
+        data_tests: [unique, not_null]
+      - name: reason
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [unknown_fuel, bad_timestamp, missing_price, out_of_range, duplicate]
+
+  - name: fct_prix
+    description: Valid price observations (grain = station x fuel x update timestamp).
+    data_tests:
+      - dbt_unique_combination:
+          arguments:
+            columns: [pdv_id, carburant_id, horodatage]
+    columns:
+      - name: prix_id
+        data_tests: [unique, not_null]
+      - name: pdv_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_station')
+                field: pdv_id
+      - name: carburant_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_carburant')
+                field: carburant_id
+      - name: date_prix
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_prix
+      - name: horodatage
+        data_tests: [not_null]
+      - name: prix_eur
+        data_tests:
+          - not_null
+          - in_range:
+              arguments:
+                min_value: 0.30
+                max_value: 4.00
+
+  - name: quarantine_prix
+    columns:
+      - name: reason
+        data_tests: [not_null]
+
+  - name: dim_station
+    columns:
+      - name: pdv_id
+        data_tests: [unique, not_null]
+      - name: dep
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_localisation')
+                field: dep
+      - name: latitude
+        data_tests:
+          - in_range:
+              arguments:
+                min_value: 41
+                max_value: 52
+      - name: longitude
+        data_tests:
+          - in_range:
+              arguments:
+                min_value: -6
+                max_value: 10
+
+  - name: dim_localisation
+    columns:
+      - name: dep
+        data_tests: [unique, not_null]
+
+  - name: dim_carburant
+    columns:
+      - name: carburant_id
+        data_tests: [unique, not_null]
+      - name: carburant
+        data_tests:
+          - unique
+          - accepted_values:
+              arguments:
+                values: [Gazole, SP95, SP98, E10, E85, GPLc]
+
+  - name: dim_date
+    columns:
+      - name: date_prix
+        data_tests: [unique, not_null]
+
+  - name: mart_prix_journalier
+    data_tests:
+      - dbt_unique_combination:
+          arguments:
+            columns: [pdv_id, carburant, date_prix]
+
+seeds:
+  - name: departements
+    columns:
+      - name: dep
+        data_tests: [unique, not_null]
